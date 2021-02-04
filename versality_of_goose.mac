@@ -1,0 +1,277 @@
+/* In the case of goose singularity of central projection */
+
+e_1:[1,0]$
+
+e_2:[0,1]$
+
+/* We assume that regular surface f is parabolic at the origin. */
+
+k1:0$
+
+/* We denote the Taylor series of central projection by P(x1,x2). */
+
+e1:[1,0,0]$
+
+e2:[0,1,0]$
+
+e3:[0,0,1]$
+
+A:matrix([cos(s),0,-sin(s)],[0,1,0],[sin(s),0,cos(s)])$
+
+B:trigsimp(invert(A))$
+
+u:[B[1].e1,B[1].e2,B[1].e3]$
+
+v:[B[2].e1,B[2].e2,B[2].e3]$
+
+w:[B[3].e1,B[3].e2,B[3].e3]$
+
+f0:f01*e1+f02*e2+f03*e3$
+
+y:y1*e1+y2*e2+y3*e3$
+
+
+f(x1,x2):=f0+x1*u+x2*v+A(x1,x2)*w$
+
+A(x1,x2):=k1*x1*x2+(k2/2)*x2^2
++(a30/6)*x1^3+(a21/2)*x1^2*x2+(a12/2)*x1*x2^2+(a03/6)*x2^3
++(a40/24)*x1^4+(a31/6)*x1^3*x2+(a22/4)*x1^2*x2^2+(a13/6)*x1*x2^3+(a04/24)*x2^4
++(a50/120)*x1^5+(a41/24)*x1^4*x2+(a32/12)*x1^3*x2^2+(a23/12)*x1^2*x2^3+(a14/24)*x1*x2^4+(a05/120)*x2^5
++(a60/720)*x1^6+(a51/120)*x1^5*x2+(a42/48)*x1^4*x2^2+(a33/36)*x1^3*x2^3+(a24/48)*x1^2*x2^4+(a15/120)*x1*x2^5+(a06/720)*x2^6
++(a70/5040)*x1^7+(a61/720)*x1^6*x2+(a52/240)*x1^5*x2^2+(a43/144)*x1^4*x2^3+(a34/144)*x1^3*x2^4+(a25/240)*x1^2*x2^5+(a16/720)*x1*x2^6+(a07/5040)*x2^7
++(a80/40320)*x1^8+(a70/5040)*x1^7*x2+(a62/1440)*x1^6*x2^2+(a53/720)*x1^5*x2^3+(a44/576)*x1^4*x2^4+(a35/720)*x1^3*x2^5+(a26/1440)*x1^2*x2^6+(a17/5040)*x1*x2^7+(a08/40320)*x2^8$
+
+t(x1,x2):=-y.e3/(e3.f(x1,x2)-y.e3)$
+
+Pi(x1,x2):=[t(x1,x2)*e1.f(x1,x2)+(1-t(x1,x2))*y.e1,t(x1,x2)*e2.f(x1,x2)+(1-t(x1,x2))*y.e2]$
+define(P(x1,x2),Pi(x1,x2)-Pi(0,0))$
+
+define(Py1(x1,x2),diff(P(x1,x2),y1,1))$
+
+define(Py1t(t),taylor(Py1(t*x1,t*x2),t,0,5))$
+
+define(Py2(x1,x2),diff(P(x1,x2),y2,1))$
+
+define(Py2t(t),taylor(Py2(t*x1,t*x2),t,0,5))$
+
+define(Py3(x1,x2),diff(P(x1,x2),y3,1))$
+
+define(Py3t(t),taylor(Py3(t*x1,t*x2),t,0,5))$
+
+y1:p1*cos(s)+f01$
+y2:f02$
+y3:p1*sin(s)+f03$
+
+
+/* The following code is preparation to define elements of the tangent space of P(x1,x2). */
+
+define(d1P(x1,x2),diff(P(x1,x2),x1,1))$
+
+define(d2P(x1,x2),diff(P(x1,x2),x2,1))$
+
+define(d1Pij(x1,x2,i,j),x1^(i)*x2^(j)*d1P(x1,x2))$
+
+define(d1Pijt(t,i,j),taylor(d1Pij(t*x1,t*x2,i,j),t,0,5))$
+
+define(d2Pij(x1,x2,i,j),x1^(i)*x2^(j)*d2P(x1,x2))$
+
+define(d2Pijt(t,i,j),taylor(d2Pij(t*x1,t*x2,i,j),t,0,5))$
+
+define(P1mP2n(x1,x2,m,n),((P(x1,x2)[1])^(m))*((P(x1,x2)[2])^(n)))$
+
+define(P1mP2nt(t,m,n),taylor(P1mP2n(t*x1,t*x2,m,n),t,0,5))$
+
+/* We define elments of tangent space for target of P(x1,x2) as the following.
+For Tij, "i" is number of multiplying P[1]、"j" is number of multiplying P[2]. */
+
+T01e1:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+T01e1:addcol(T01e1,[factor(coeff(coeff(coeff(P1mP2nt(t,0,1),t,k),x1,k-l),x2,l)),0]);
+
+T01e2:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+T01e2:addcol(T01e2,[0,factor(coeff(coeff(coeff(P1mP2nt(t,0,1),t,k),x1,k-l),x2,l))]);
+
+
+T02e1:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+T02e1:addcol(T02e1,[factor(coeff(coeff(coeff(P1mP2nt(t,0,2),t,k),x1,k-l),x2,l)),0]);
+
+T03e1:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+T03e1:addcol(T03e1,[factor(coeff(coeff(coeff(P1mP2nt(t,0,3),t,k),x1,k-l),x2,l)),0]);
+
+/* We define elments of tangent space for source of P(x1,x2) as follows: */
+
+d1P00:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d1P00:addcol(d1P00,[factor(coeff(coeff(coeff(d1Pijt(t,0,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,0,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P00:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P00:addcol(d2P00,[factor(coeff(coeff(coeff(d2Pijt(t,0,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,0,0),t,k),x1,k-l),x2,l)[2])]);
+
+
+d1P10:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d1P10:addcol(d1P10,[factor(coeff(coeff(coeff(d1Pijt(t,1,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,1,0),t,k),x1,k-l),x2,l)[2])]);
+
+d1P01:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d1P01:addcol(d1P01,[factor(coeff(coeff(coeff(d1Pijt(t,0,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,0,1),t,k),x1,k-l),x2,l)[2])]);
+
+d2P10:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P10:addcol(d2P10,[factor(coeff(coeff(coeff(d2Pijt(t,1,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,1,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P01:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P01:addcol(d2P01,[factor(coeff(coeff(coeff(d2Pijt(t,0,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,0,1),t,k),x1,k-l),x2,l)[2])]);
+
+
+d1P20:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d1P20:addcol(d1P20,[factor(coeff(coeff(coeff(d1Pijt(t,2,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,2,0),t,k),x1,k-l),x2,l)[2])]);
+
+d1P11:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d1P11:addcol(d1P11,[factor(coeff(coeff(coeff(d1Pijt(t,1,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,1,1),t,k),x1,k-l),x2,l)[2])]);
+
+d1P02:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d1P02:addcol(d1P02,[factor(coeff(coeff(coeff(d1Pijt(t,0,2),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,0,2),t,k),x1,k-l),x2,l)[2])]);
+
+d2P20:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P20:addcol(d2P20,[factor(coeff(coeff(coeff(d2Pijt(t,2,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,2,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P11:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P11:addcol(d2P11,[factor(coeff(coeff(coeff(d2Pijt(t,1,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,1,1),t,k),x1,k-l),x2,l)[2])]);
+
+d2P02:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P02:addcol(d2P02,[factor(coeff(coeff(coeff(d2Pijt(t,0,2),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,0,2),t,k),x1,k-l),x2,l)[2])]);
+
+d2P30:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P30:addcol(d2P30,[factor(coeff(coeff(coeff(d2Pijt(t,3,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,3,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P21:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P21:addcol(d2P21,[factor(coeff(coeff(coeff(d2Pijt(t,2,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,2,1),t,k),x1,k-l),x2,l)[2])]);
+
+d2P12:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+d2P12:addcol(d2P12,[factor(coeff(coeff(coeff(d2Pijt(t,1,2),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,1,2),t,k),x1,k-l),x2,l)[2])]);
+
+/* differential of P(x1,x2) for viewpont y is written as follows: */
+
+Py2:matrix([]);
+for k:1 while (k<=4) do
+for l:0 while (l<=k) do
+Py2:addcol(Py2,[factor(coeff(coeff(coeff(Py2t(t),t,k),x1,k-l),x2,l))[1],factor(coeff(coeff(coeff(Py2t(t),t,k),x1,k-l),x2,l))[2]]);
+
+
+M:addrow(Py2,
+T01e1,T01e2,
+T02e1,
+T03e1,
+d1P00,d2P00,
+d1P10,d1P01,d2P10,d2P01,
+d1P20,d1P11,d1P02,d2P20,d2P11,d2P02,
+d2P30,d2P21,d2P12
+)$
+
+/* We prove the regularity of the matrix M1 which is expressed by the table in page 25-26 on paper. 
+The following codes are Gauss elimination method for the matrix M1. */
+
+M1:factor(trigsimp(submatrix(M,
+1,18,20,22,24,26,27,28)))$
+
+D1:matrix(M1[1],M1[2],M1[3],M1[4],M1[5],
+M1[6],M1[7],M1[8],M1[9],M1[10],
+M1[11],M1[12],M1[13],M1[14],M1[15],
+M1[16],M1[17],M1[18],M1[19],M1[20])$
+
+DD1:factor(trigsimp(
+matrix(M1[1],M1[2],M1[3]-M1[11],M1[4],M1[5],
+M1[6]-M1[11]/p1,M1[7]+M1[1]+k2*M1[2]/sin(s),M1[8],M1[9],M1[10]+p1*M1[1],
+M1[11],M1[12],M1[13],M1[14],M1[15],
+M1[16],M1[17],M1[18],M1[19],M1[20])))$
+
+
+/* From DD1, we know the elements 
+Py2(=M1[1]), T01e1(=M1[2]), d2P01(=M1[11]), d2P20(=M1[15])
+generate monomials
+ x1e2, x2e1, x2e2, x1^2e2. */
+
+D2:factor(trigsimp(submatrix(1,2,11,15,DD1,1,2,3,5)))$
+
+DD2:factor(trigsimp(
+    matrix(D2[1],D2[2],D2[3],D2[4],D2[5],
+D2[6],D2[7],D2[8],D2[9],D2[10],
+D2[11],D2[12],D2[13],D2[14],D2[15],
+D2[16])))$
+
+DD2:factor(trigsimp(
+matrix(D2[1],D2[2],D2[3],D2[4],
+D2[5]-D2[4]*a21/a30-D2[8]/p1+D2[6]*a21/(a30*p1),
+D2[6],D2[7],D2[8],D2[9],D2[10],
+D2[11],D2[12]-D2[6]*p1,D2[13],D2[14],D2[15],
+D2[16])))$
+
+/* factor(
+trigsimp(subst((a12*a30-a21^2)*p1^2/(a30*p1),k2,
+        DD2)));*/
+
+
+/* From DD2, we know 
+DD2[4]=M1[6]-M1[11]/p1=d1P00-d2P01/p1, 
+DD2[6]=M1[8]=d1P10, 
+DD2[8]=M1[10]+p1*M1[1]=d2P10+p1*Py2, 
+generate
+x1^2e1, x1x2e1, x1x2e2. */
+
+D3:factor(trigsimp(submatrix(4,6,8,DD2,1,2,3)))$
+
+DD3:factor(trigsimp(
+matrix(D3[1],D3[2],D3[3],D3[4],D3[5],
+D3[6],D3[7],D3[8],D3[9],D3[10],
+D3[11],D3[12],D3[13])))$
+
+DD3:factor(trigsimp(
+matrix(D3[1],D3[2]-D3[2][1]*D3[1]/D3[1][1],
+            D3[3],D3[4]-D3[4][1]*D3[1]/D3[1][1],D3[5]-D3[10]/p1,
+D3[6],D3[7],D3[8],D3[9],D3[10],
+D3[11],D3[12],D3[13])))$
+
+/* factor(newdet(
+trigsimp(subst((a12*a30-a21^2)*p1^2/(a30*p1),k2,D3)))); */
+
+detDD3:factor(newdet(
+trigsimp(subst((a12*a30-a21^2)*p1^2/(a30*p1),k2,DD3))));
+
+/*
+Since the determinant of the matrix DD3 written as detDD3 does not vanish, 
+we complete the proof of the regularity. 
+*/
