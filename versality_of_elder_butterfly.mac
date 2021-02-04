@@ -1,0 +1,275 @@
+/* We compute in the proof of versality of central projection unfolding at elder butterfly singularity. */
+
+e_1:[1,0]$
+
+e_2:[0,1]$
+
+/* The following conditions is of contact with the viewline and a surface for elder butterfly singularity. */
+
+a30:0$
+a40:0$
+
+/* We denote the Taylor series of central projection by P(x1,x2). */
+
+e1:[1,0,0]$
+
+e2:[0,1,0]$
+
+e3:[0,0,1]$
+
+A:matrix([cos(s),0,-sin(s)],[0,1,0],[sin(s),0,cos(s)])$
+
+B:trigsimp(invert(A))$
+
+u:[B[1].e1,B[1].e2,B[1].e3]$
+
+v:[B[2].e1,B[2].e2,B[2].e3]$
+
+w:[B[3].e1,B[3].e2,B[3].e3]$
+
+f0:f01*e1+f02*e2+f03*e3$
+
+y:y1*e1+y2*e2+y3*e3$
+
+
+f(x1,x2):=f0+x1*u+x2*v+A(x1,x2)*w$
+
+A(x1,x2):=k1*x1*x2+(k2/2)*x2^2
++(a30/6)*x1^3+(a21/2)*x1^2*x2+(a12/2)*x1*x2^2+(a03/6)*x2^3
++(a40/24)*x1^4+(a31/6)*x1^3*x2+(a22/4)*x1^2*x2^2+(a13/6)*x1*x2^3+(a04/24)*x2^4
++(a50/120)*x1^5+(a41/24)*x1^4*x2+(a32/12)*x1^3*x2^2+(a23/12)*x1^2*x2^3+(a14/24)*x1*x2^4+(a05/120)*x2^5
++(a60/720)*x1^6+(a51/120)*x1^5*x2+(a42/48)*x1^4*x2^2+(a33/36)*x1^3*x2^3+(a24/48)*x1^2*x2^4+(a15/120)*x1*x2^5+(a06/720)*x2^6
++(a70/5040)*x1^7+(a61/720)*x1^6*x2+(a52/240)*x1^5*x2^2+(a43/144)*x1^4*x2^3+(a34/144)*x1^3*x2^4+(a25/240)*x1^2*x2^5+(a16/720)*x1*x2^6+(a07/5040)*x2^7
++(a80/40320)*x1^8+(a70/5040)*x1^7*x2+(a62/1440)*x1^6*x2^2+(a53/720)*x1^5*x2^3+(a44/576)*x1^4*x2^4+(a35/720)*x1^3*x2^5+(a26/1440)*x1^2*x2^6+(a17/5040)*x1*x2^7+(a08/40320)*x2^8$
+
+t(x1,x2):=-y.e3/(e3.f(x1,x2)-y.e3)$
+
+Pi(x1,x2):=[t(x1,x2)*e1.f(x1,x2)+(1-t(x1,x2))*y.e1,t(x1,x2)*e2.f(x1,x2)+(1-t(x1,x2))*y.e2]$
+define(P(x1,x2),Pi(x1,x2)-Pi(0,0))$
+
+define(Py1(x1,x2),diff(P(x1,x2),y1,1))$
+
+define(Py1t(t),taylor(Py1(t*x1,t*x2),t,0,7))$
+
+define(Py2(x1,x2),diff(P(x1,x2),y2,1))$
+
+define(Py2t(t),taylor(Py2(t*x1,t*x2),t,0,7))$
+
+define(Py3(x1,x2),diff(P(x1,x2),y3,1))$
+
+define(Py3t(t),taylor(Py3(t*x1,t*x2),t,0,7))$
+
+y1:p1*cos(s)+f01$
+y2:f02$
+y3:p1*sin(s)+f03$
+
+
+/* The following code is preparation to define elements of the tangent space of P(x1,x2). */
+define(d1P(x1,x2),diff(P(x1,x2),x1,1))$
+
+define(d2P(x1,x2),diff(P(x1,x2),x2,1))$
+
+define(d1Pij(x1,x2,i,j),x1^(i)*x2^(j)*d1P(x1,x2))$
+
+define(d1Pijt(t,i,j),taylor(d1Pij(t*x1,t*x2,i,j),t,0,7))$
+
+define(d2Pij(x1,x2,i,j),x1^(i)*x2^(j)*d2P(x1,x2))$
+
+define(d2Pijt(t,i,j),taylor(d2Pij(t*x1,t*x2,i,j),t,0,7))$
+
+define(P1mP2n(x1,x2,m,n),((P(x1,x2)[1])^(m))*((P(x1,x2)[2])^(n)))$
+
+define(P1mP2nt(t,m,n),taylor(P1mP2n(t*x1,t*x2,m,n),t,0,7))$
+
+/* We define elments of tangent space for target of P(x1,x2) as the following.
+For Tij, "i" is number of multiplying P[1]、"j" is number of multiplying P[2]. */
+
+T10e1:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+T10e1:addcol(T10e1,[factor(coeff(coeff(coeff(P1mP2nt(t,1,0),t,k),x1,k-l),x2,l)),0]);
+
+T10e2:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+T10e2:addcol(T10e2,[0,factor(coeff(coeff(coeff(P1mP2nt(t,1,0),t,k),x1,k-l),x2,l))]);
+
+T01e1:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+T01e1:addcol(T01e1,[factor(coeff(coeff(coeff(P1mP2nt(t,0,1),t,k),x1,k-l),x2,l)),0]);
+
+T01e2:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+T01e2:addcol(T01e2,[0,factor(coeff(coeff(coeff(P1mP2nt(t,0,1),t,k),x1,k-l),x2,l))]);
+
+/* We define elments of tangent space for source of P(x1,x2) as follows: */
+
+d1P00:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P00:addcol(d1P00,[factor(coeff(coeff(coeff(d1Pijt(t,0,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,0,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P00:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P00:addcol(d2P00,[factor(coeff(coeff(coeff(d2Pijt(t,0,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,0,0),t,k),x1,k-l),x2,l)[2])]);
+
+
+d1P10:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P10:addcol(d1P10,[factor(coeff(coeff(coeff(d1Pijt(t,1,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,1,0),t,k),x1,k-l),x2,l)[2])]);
+
+d1P01:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P01:addcol(d1P01,[factor(coeff(coeff(coeff(d1Pijt(t,0,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,0,1),t,k),x1,k-l),x2,l)[2])]);
+
+d2P10:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P10:addcol(d2P10,[factor(coeff(coeff(coeff(d2Pijt(t,1,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,1,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P01:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P01:addcol(d2P01,[factor(coeff(coeff(coeff(d2Pijt(t,0,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,0,1),t,k),x1,k-l),x2,l)[2])]);
+
+
+d1P20:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P20:addcol(d1P20,[factor(coeff(coeff(coeff(d1Pijt(t,2,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,2,0),t,k),x1,k-l),x2,l)[2])]);
+
+d1P11:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P11:addcol(d1P11,[factor(coeff(coeff(coeff(d1Pijt(t,1,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,1,1),t,k),x1,k-l),x2,l)[2])]);
+
+d1P02:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P02:addcol(d1P02,[factor(coeff(coeff(coeff(d1Pijt(t,0,2),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,0,2),t,k),x1,k-l),x2,l)[2])]);
+
+d2P20:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P20:addcol(d2P20,[factor(coeff(coeff(coeff(d2Pijt(t,2,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,2,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P11:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P11:addcol(d2P11,[factor(coeff(coeff(coeff(d2Pijt(t,1,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,1,1),t,k),x1,k-l),x2,l)[2])]);
+
+d2P02:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P02:addcol(d2P02,[factor(coeff(coeff(coeff(d2Pijt(t,0,2),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,0,2),t,k),x1,k-l),x2,l)[2])]);
+
+
+d1P30:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P30:addcol(d1P30,[factor(coeff(coeff(coeff(d1Pijt(t,3,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,3,0),t,k),x1,k-l),x2,l)[2])]);
+
+d1P21:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P21:addcol(d1P21,[factor(coeff(coeff(coeff(d1Pijt(t,2,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,2,1),t,k),x1,k-l),x2,l)[2])]);
+
+d1P12:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P12:addcol(d1P12,[factor(coeff(coeff(coeff(d1Pijt(t,1,2),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,1,2),t,k),x1,k-l),x2,l)[2])]);
+
+d1P03:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d1P03:addcol(d1P03,[factor(coeff(coeff(coeff(d1Pijt(t,0,3),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d1Pijt(t,0,3),t,k),x1,k-l),x2,l)[2])]);
+
+d2P30:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P30:addcol(d2P30,[factor(coeff(coeff(coeff(d2Pijt(t,3,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,3,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P21:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P21:addcol(d2P21,[factor(coeff(coeff(coeff(d2Pijt(t,2,1),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,2,1),t,k),x1,k-l),x2,l)[2])]);
+
+d2P12:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P12:addcol(d2P12,[factor(coeff(coeff(coeff(d2Pijt(t,1,2),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,1,2),t,k),x1,k-l),x2,l)[2])]);
+
+d2P03:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P03:addcol(d2P03,[factor(coeff(coeff(coeff(d2Pijt(t,0,3),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,0,3),t,k),x1,k-l),x2,l)[2])]);
+
+
+d2P40:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P40:addcol(d2P40,[factor(coeff(coeff(coeff(d2Pijt(t,4,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,4,0),t,k),x1,k-l),x2,l)[2])]);
+
+
+d2P50:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P50:addcol(d2P50,[factor(coeff(coeff(coeff(d2Pijt(t,5,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,5,0),t,k),x1,k-l),x2,l)[2])]);
+
+d2P60:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+d2P60:addcol(d2P60,[factor(coeff(coeff(coeff(d2Pijt(t,6,0),t,k),x1,k-l),x2,l)[1]),factor(coeff(coeff(coeff(d2Pijt(t,6,0),t,k),x1,k-l),x2,l)[2])]);
+
+/* differential of P(x1,x2) for viewpont y is written as follows: */
+
+Py1:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+Py1:addcol(Py1,[factor(coeff(coeff(coeff(Py1t(t),t,k),x1,k-l),x2,l))[1],factor(coeff(coeff(coeff(Py1t(t),t,k),x1,k-l),x2,l))[2]]);
+
+Py2:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+Py2:addcol(Py2,[factor(coeff(coeff(coeff(Py2t(t),t,k),x1,k-l),x2,l))[1],factor(coeff(coeff(coeff(Py2t(t),t,k),x1,k-l),x2,l))[2]]);
+
+Py3:matrix([]);
+for k:1 while (k<=7) do
+for l:0 while (l<=k) do
+Py3:addcol(Py3,[factor(coeff(coeff(coeff(Py3t(t),t,k),x1,k-l),x2,l))[1],factor(coeff(coeff(coeff(Py3t(t),t,k),x1,k-l),x2,l))[2]]);
+
+/* We compute the determinant of D_1 written as "det1". */
+
+M1:factor(trigsimp(addrow(Py3+Py1/tan(s),
+T10e1,T10e2,T01e1,T01e2,
+d1P00,
+d1P10,
+d1P20,d2P11,
+d1P30,
+d2P30,d2P21,
+d2P40,
+d2P50,
+d2P60
+)))$
+
+D_1:factor(trigsimp(
+submatrix(M1,1,2,5,6,9,10,11,
+    15,16,17,18,
+    22,23,24,25,26,27,28,
+    31,32,33,34,35,36,37,38,39,40,
+    43,44,45,46,47,48,49,50,51,52,53,54,
+56,57,58,59,60,61,62,63,64,65,66,67,68,69,70)));
+
+ButterflyFocal:48*a50*a70*k1^2*p1^2-35*a60^2*k1^2*p1^2+42*a21*a50*a60*k1*p1^2-1680*a31*a50^2*k1*p1^2+2205*a21^2*a50^2*p1^2-84*a50*a60*k1^2*p1+252*a21*a50^2*k1*p1+756*a50^2*k1^2$
+
+c:(p1*sin(s)+f03)/(p1*sin(s))$
+
+det1:factor(newdet(D_1))$
+
+factor(ratsubst(y_3,p1*sin(s)+f03,
+        det1/c^24));
